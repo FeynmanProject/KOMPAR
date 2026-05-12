@@ -2,7 +2,7 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,8 +11,156 @@
       rel="stylesheet"
     />
     <title>Anime Recommender</title>
+
+    <!--
+      Restore the user's saved theme BEFORE any pixels are painted so the
+      splash screen below (and the dark/light app afterwards) opens in the
+      correct color scheme instead of flashing dark→light on light-mode
+      reloads. The favicon is swapped at the same time so the browser tab
+      icon matches the user's chosen theme on the very first request, not
+      after React boots. Wrapped in try/catch because some browsers throw
+      on localStorage access (private mode, sandboxed iframes, etc.).
+    -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("anime-recommender-theme");
+          if (t === "light") {
+            document.documentElement.setAttribute("data-theme", "light");
+            var fav = document.getElementById("favicon");
+            if (fav) fav.setAttribute("href", "/favicon-light.svg");
+          }
+        } catch (e) {
+          /* ignore */
+        }
+      })();
+    </script>
+
+    <!--
+      Splash screen styles are inlined in <head> so they apply IMMEDIATELY
+      on first paint, before the Tailwind/index.css bundle parses. This is
+      the whole point of the splash on slow machines: something visible
+      *now*, instead of a flash of white nothing while JS boots.
+    -->
+    <style>
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        color: #e7e7ea;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        transition: opacity 450ms ease-out, visibility 450ms ease-out;
+      }
+      html[data-theme="light"] #splash-screen {
+        background: #f4f4f4;
+        color: #0a0a0a;
+      }
+      #splash-screen.is-hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .splash-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        padding: 24px;
+      }
+      .splash-sparkle {
+        animation: splashPulse 1.6s ease-in-out infinite;
+      }
+      html[data-theme="light"] .splash-sparkle svg {
+        filter: grayscale(1) brightness(0.35) contrast(1.2);
+      }
+      @keyframes splashPulse {
+        0%, 100% { transform: scale(1);    opacity: 0.85; }
+        50%      { transform: scale(1.10); opacity: 1; }
+      }
+      .splash-title {
+        font-family: "Instrument Serif", Georgia, serif;
+        font-size: 32px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin-top: 6px;
+      }
+      .splash-title em {
+        font-style: italic;
+        opacity: 0.5;
+      }
+      .splash-dots {
+        display: flex;
+        gap: 7px;
+        margin-top: 6px;
+      }
+      .splash-dots span {
+        width: 6px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.55);
+        animation: splashDot 1.2s ease-in-out infinite;
+      }
+      html[data-theme="light"] .splash-dots span {
+        background: rgba(0, 0, 0, 0.50);
+      }
+      .splash-dots span:nth-child(2) { animation-delay: 0.18s; }
+      .splash-dots span:nth-child(3) { animation-delay: 0.36s; }
+      @keyframes splashDot {
+        0%, 100% { opacity: 0.25; transform: translateY(0); }
+        50%      { opacity: 1;    transform: translateY(-3px); }
+      }
+      .splash-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.55;
+        margin-top: 4px;
+      }
+    </style>
   </head>
   <body class="text-slate-100 antialiased">
+    <!--
+      Splash screen: rendered server-side so it appears the moment the
+      browser parses the HTML. React removes it (via `useSplashLifecycle`)
+      after fonts + the initial /meta API call are ready, with a minimum
+      display time so it never flashes for one frame and a safety timeout
+      so a hung backend can't keep the user locked out forever.
+    -->
+    <div id="splash-screen" role="status" aria-live="polite" aria-label="Memuat aplikasi">
+      <div class="splash-content">
+        <div class="splash-sparkle">
+          <svg width="56" height="56" viewBox="0 0 32 32" aria-hidden="true">
+            <defs>
+              <linearGradient id="splash-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e9d5ff" />
+                <stop offset="55%" stop-color="#a78bfa" />
+                <stop offset="100%" stop-color="#6d28d9" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 16 4 C 16 14, 18 16, 28 16 C 18 16, 16 18, 16 28 C 16 18, 14 16, 4 16 C 14 16, 16 14, 16 4 Z"
+              fill="url(#splash-grad)"
+            />
+            <path
+              d="M 25 5 C 25 7.5, 25.5 8, 28 8 C 25.5 8, 25 8.5, 25 11 C 25 8.5, 24.5 8, 22 8 C 24.5 8, 25 7.5, 25 5 Z"
+              fill="#e9d5ff"
+              opacity="0.7"
+            />
+          </svg>
+        </div>
+        <div class="splash-title"><em>A</em>nime Recommender</div>
+        <div class="splash-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="splash-label">Menyiapkan dataset</div>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

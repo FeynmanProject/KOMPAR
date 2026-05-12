@@ -270,3 +270,326 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(124, 58, 237, 0.55);
 }
+
+/* ────────────────────────────────────────────────────────────
+   LIGHT-MODE OVERRIDES — strict monochrome (no purple, no cream)
+   Activated via <html data-theme="light"> from useTheme() in
+   App.jsx. Every rule below is ADDITIVE: dark mode (the default
+   when no attribute is set) keeps its original styling untouched.
+
+   Most rules are scoped to `main` / `footer` so the navigation
+   pill in the header keeps its dark-glass look, matching the
+   reference design where the floating nav stays dark regardless
+   of theme. The few rules that DO reach into the header (e.g.
+   nav-cta, the sparkle SVG) are not main-scoped on purpose so
+   they can replace remaining violet accents inside the dark
+   navigation pill.
+   ──────────────────────────────────────────────────────────── */
+
+html[data-theme="light"] {
+  background: #f4f4f4;
+}
+html[data-theme="light"] body {
+  color: #0a0a0a;
+}
+html[data-theme="light"] ::selection {
+  background: rgba(0, 0, 0, 0.14);
+  color: #0a0a0a;
+}
+
+/* ── Text utility overrides (only in main + footer) ─────── */
+[data-theme="light"] main .text-white,
+[data-theme="light"] footer .text-white {
+  color: #0a0a0a;
+}
+[data-theme="light"] main .text-slate-100 { color: #1a1a1f; }
+[data-theme="light"] main .text-slate-200 { color: #2a2a2f; }
+[data-theme="light"] main .text-slate-300 { color: #3a3a40; }
+[data-theme="light"] main .text-slate-400 { color: #56565d; }
+[data-theme="light"] main .text-slate-500 { color: #76767d; }
+[data-theme="light"] main .text-slate-600 { color: #95959c; }
+[data-theme="light"] footer .text-slate-500 { color: #85858c; }
+[data-theme="light"] footer .text-slate-600 { color: #9a9aa0; }
+
+/* Violet accent text → flat dark gray everywhere in main.
+   Covers both static (.text-accent-*) and the Tailwind hover/group-hover
+   variants used by Home.jsx StepCard headings, where the italic emphasis
+   word turns violet on hover — that's the remaining purple flash the user
+   reported in the "Proses" section. */
+[data-theme="light"] main .text-accent-300,
+[data-theme="light"] main .text-accent-400 {
+  color: #0a0a0a;
+}
+[data-theme="light"] main .group:hover .group-hover\:text-accent-300,
+[data-theme="light"] main .group:hover .group-hover\:text-accent-400,
+[data-theme="light"] main .hover\:text-accent-300:hover,
+[data-theme="light"] main .hover\:text-accent-400:hover {
+  color: #0a0a0a;
+}
+
+/* Recharts chart titles inherit text-white via h4 above — already handled. */
+
+/* ── Glass surfaces (cards, panels, modal sheet) ─────────── */
+[data-theme="light"] main .glass-panel {
+  background-color: rgba(255, 255, 255, 0.72);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.03),
+    0 16px 40px -12px rgba(0, 0, 0, 0.10),
+    0 2px 8px -2px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] main .glass-panel::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(255, 255, 255, 0) 65%,
+    rgba(255, 255, 255, 0.20) 100%
+  );
+}
+[data-theme="light"] main .card-flat {
+  background-color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Pills, labels, inputs ──────────────────────────────── */
+[data-theme="light"] main .pill {
+  background-color: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.10);
+  color: #1a1a1f;
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.75),
+    0 4px 14px -4px rgba(0, 0, 0, 0.10);
+}
+[data-theme="light"] main .label { color: #76767d; }
+
+[data-theme="light"] main .input {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #0a0a0a;
+  --tw-ring-color: rgba(0, 0, 0, 0.20);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.55);
+}
+[data-theme="light"] main .input::placeholder { color: #8a8a92; }
+[data-theme="light"] main .input:focus {
+  background-color: #ffffff;
+  border-color: #0a0a0a;
+}
+/* Chevron stroke darkened so it's visible on the light input. */
+[data-theme="light"] main select.input {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233a3a40' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+/* SearchBar uses !important on its placeholder; mirror that here */
+[data-theme="light"] main .placeholder\:\!text-slate-300\/80::placeholder {
+  color: rgba(90, 90, 100, 0.85) !important;
+}
+
+/* Stepper buttons inside NumberInput */
+[data-theme="light"] main .stepper-btn { color: #3a3a40; }
+[data-theme="light"] main .stepper-btn:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #0a0a0a;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+
+/* Primary CTAs lose their violet fill and become solid black pills,
+   matching the "Get In Touch Today" treatment in the reference. */
+[data-theme="light"] main .btn-primary {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.30);
+}
+[data-theme="light"] main .btn-primary:hover {
+  background-color: #1f1f24;
+}
+
+[data-theme="light"] main .btn-ghost {
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #0a0a0a;
+}
+[data-theme="light"] main .btn-ghost:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] main .btn-outline {
+  border-color: rgba(0, 0, 0, 0.30);
+  color: #0a0a0a;
+}
+[data-theme="light"] main .btn-outline:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] main .btn-dark {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.10);
+  color: #0a0a0a;
+}
+[data-theme="light"] main .btn-dark:hover {
+  background-color: rgba(0, 0, 0, 0.10);
+}
+
+/* nav-cta lives INSIDE the (still dark) header pill, so we don't scope this
+   to `main`. We invert it: a white pill with dark text reading as the
+   prominent action — same treatment as "Get Now" in the reference. */
+[data-theme="light"] .nav-cta {
+  background-color: #ffffff;
+  color: #0a0a0a;
+  box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.45);
+}
+[data-theme="light"] .nav-cta:hover {
+  background-color: #f0f0f0;
+}
+
+/* ── Stat card hover halo (monochrome) ───────────────────── */
+[data-theme="light"] main .stat-card:hover {
+  background-color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.80),
+    0 22px 50px -14px rgba(0, 0, 0, 0.18),
+    0 4px 12px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Italic emphasis word — muted gray, no violet glow on hover ─ */
+[data-theme="light"] main .emphasis { color: #9a9aa0; }
+[data-theme="light"] main .emphasis:hover {
+  color: #0a0a0a;
+  text-shadow: none;
+}
+
+/* ── Translucent black overlays → neutral grays on white ─── */
+[data-theme="light"] main .bg-black\/85 { background-color: rgba(255, 255, 255, 0.96); }
+[data-theme="light"] main .bg-black\/70 { background-color: rgba(0, 0, 0, 0.32); }
+[data-theme="light"] main .bg-black\/60 { background-color: rgba(0, 0, 0, 0.55); }
+[data-theme="light"] main .bg-black\/40 { background-color: rgba(0, 0, 0, 0.06); }
+[data-theme="light"] main .bg-black\/30 { background-color: rgba(0, 0, 0, 0.05); }
+
+/* ── Subtle white tints → subtle neutral dark tints ─────── */
+[data-theme="light"] main .bg-white\/\[0\.03\],
+[data-theme="light"] main .bg-white\/\[0\.05\],
+[data-theme="light"] main .bg-white\/\[0\.06\],
+[data-theme="light"] main .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+[data-theme="light"] main .hover\:bg-white\/5:hover,
+[data-theme="light"] main .hover\:bg-white\/\[0\.05\]:hover,
+[data-theme="light"] main .hover\:bg-white\/\[0\.08\]:hover,
+[data-theme="light"] main .hover\:bg-white\/\[0\.10\]:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* ── White borders → neutral dark borders ────────────────── */
+[data-theme="light"] main .border-white\/5,
+[data-theme="light"] main .border-white\/10,
+[data-theme="light"] main .border-white\/\[0\.05\],
+[data-theme="light"] main .border-white\/\[0\.06\],
+[data-theme="light"] main .border-white\/\[0\.08\],
+[data-theme="light"] main .border-white\/\[0\.10\],
+[data-theme="light"] main .border-white\/\[0\.12\],
+[data-theme="light"] footer.border-t {
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Image / poster placeholders ─────────────────────────── */
+[data-theme="light"] main .bg-ink-800 {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ── AnimeCard MetaPill + DetailModal close button — white pill on
+       the cream-free light surface. ─────────────────────── */
+[data-theme="light"] main .bg-white\/\[0\.04\] {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── ALL violet/neon accent surfaces → flat neutral grays ─
+       Covers genre tags, execution badges, recommendation result
+       dots, FavoriteCard label, Benchmark worker toggle, etc. ── */
+[data-theme="light"] main .bg-accent-500\/5,
+[data-theme="light"] main .bg-accent-500\/10,
+[data-theme="light"] main .bg-accent-500\/15,
+[data-theme="light"] main .bg-accent-500\/20 {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] main .bg-accent-500 {
+  background-color: #0a0a0a;
+}
+[data-theme="light"] main .border-accent-500,
+[data-theme="light"] main .border-accent-500\/40,
+[data-theme="light"] main .border-accent-500\/50 {
+  border-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Recommendation ExecutionBadge + Speedup/Efficiency cards use neon
+   pink/lime/cyan borders + tinted bg. Light mode neutralizes them so
+   the page is strictly monochrome. */
+[data-theme="light"] main .bg-neon-pink,
+[data-theme="light"] main .bg-neon-pink\/5 {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] main .border-neon-pink\/40,
+[data-theme="light"] main .border-neon-lime\/40,
+[data-theme="light"] main .border-neon-cyan\/40 {
+  border-color: rgba(0, 0, 0, 0.18);
+}
+[data-theme="light"] main .bg-neon-lime\/5,
+[data-theme="light"] main .bg-neon-cyan\/5 {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+/* The two colored result-section dots also become solid dark. */
+[data-theme="light"] main .bg-neon-pink {
+  background-color: #2a2a2f;
+}
+
+/* The hero blur ball — drop the violet glow entirely. */
+[data-theme="light"] main .bg-accent-500\/20 {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Violet rings (focus, focus-visible) → neutral dark rings */
+[data-theme="light"] main .ring-accent-400\/30,
+[data-theme="light"] main .focus\:ring-accent-400\/30:focus,
+[data-theme="light"] main .focus-visible\:ring-accent-400\/60:focus-visible {
+  --tw-ring-color: rgba(0, 0, 0, 0.45);
+}
+
+/* Violet hover glow on AnimeCard → neutral dark drop shadow. */
+[data-theme="light"] main .hover\:shadow-glow:hover {
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.20);
+}
+
+/* AnimeCard ScoreRing — the linearGradient stops are set inline from JS
+   (see ScoreRing in AnimeCard.jsx) so they don't need CSS overrides; they
+   pick up the light-mode colors automatically via useThemeAttribute. */
+
+/* ── Scrollbar on light surface ─────────────────────────── */
+html[data-theme="light"] ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.28);
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.48);
+}
+
+/* ── Brand sparkle SVG ───────────────────────────────────
+   The logo's `linearGradient` uses hard-coded violet stops we can't
+   easily override per stop. A grayscale + darken filter turns the
+   gradient into a clean black-to-gray sparkle in light mode so the
+   logo no longer leaks purple into an otherwise monochrome design. */
+[data-theme="light"] .brand-theme-toggle svg {
+  filter: grayscale(1) brightness(0.35) contrast(1.2);
+}
+
+/* ── Theme toggle ring — distinct per mode so users can tell at a
+       glance which mode is currently active. ──────────────── */
+.brand-theme-toggle {
+  box-shadow: 0 0 0 1px rgba(167, 139, 250, 0.18);
+}
+[data-theme="light"] .brand-theme-toggle {
+  box-shadow:
+    0 0 0 1.5px rgba(255, 255, 255, 0.45),
+    0 0 12px rgba(255, 255, 255, 0.28);
+}

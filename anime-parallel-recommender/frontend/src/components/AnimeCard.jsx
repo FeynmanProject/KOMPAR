@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useState } from "react";
+import { useThemeAttribute } from "../lib/useTheme.js";
 
 /**
  * Circular similarity-percentage indicator.
@@ -13,6 +14,12 @@ function ScoreRing({ value, className = "h-12 w-12" }) {
   const circumference = 2 * Math.PI * radius;
   const dash = (clamped / 100) * circumference;
   const gradId = useId();
+  // The percentage ring uses a 2-stop gradient. In dark mode it's the original
+  // violet→pink so the look the project shipped with is preserved; in light
+  // mode it becomes a black→mid-gray gradient so no purple bleeds through.
+  const isLight = useThemeAttribute() === "light";
+  const stopStart = isLight ? "#0a0a0a" : "#7c5cff";
+  const stopEnd = isLight ? "#7a7a82" : "#ff5dba";
 
   const label = `${clamped.toFixed(0)}%`;
   // Three brackets so 0–9, 10–99, and 100 each get a font size that breathes
@@ -59,8 +66,8 @@ function ScoreRing({ value, className = "h-12 w-12" }) {
         </text>
         <defs>
           <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#7c5cff" />
-            <stop offset="1" stopColor="#ff5dba" />
+            <stop offset="0" stopColor={stopStart} />
+            <stop offset="1" stopColor={stopEnd} />
           </linearGradient>
         </defs>
       </svg>

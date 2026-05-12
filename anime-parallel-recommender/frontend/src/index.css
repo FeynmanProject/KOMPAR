@@ -561,7 +561,13 @@ html[data-theme="light"] ::selection {
 
 /* AnimeCard ScoreRing — the linearGradient stops are set inline from JS
    (see ScoreRing in AnimeCard.jsx) so they don't need CSS overrides; they
-   pick up the light-mode colors automatically via useThemeAttribute. */
+   pick up the light-mode colors automatically via useThemeAttribute.
+   The percentage *label* inside the ring is an SVG <text> with Tailwind's
+   `fill-white` utility, which renders invisible on the new light surface.
+   Flip it to near-black here so the number stays legible. */
+[data-theme="light"] main .fill-white {
+  fill: #0a0a0a;
+}
 
 /* ── Scrollbar on light surface ─────────────────────────── */
 html[data-theme="light"] ::-webkit-scrollbar-track {

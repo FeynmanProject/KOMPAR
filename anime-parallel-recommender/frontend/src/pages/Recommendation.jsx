@@ -1,60 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import SearchBar from "../components/SearchBar.jsx";
 import FilterPanel from "../components/FilterPanel.jsx";
 import RecommendationList from "../components/RecommendationList.jsx";
+import HintStrip, { PlayMiniIcon, SearchMiniIcon } from "../components/HintStrip.jsx";
+import FavoriteCard from "../components/FavoriteCard.jsx";
+import NewSearchBanner from "../components/NewSearchBanner.jsx";
 import animeApi from "../api/animeApi.js";
-
-function FavoriteCard({ anime }) {
-  if (!anime) return null;
-  return (
-    <div className="card flex gap-4">
-      <div className="h-44 w-32 shrink-0 overflow-hidden rounded-xl bg-ink-800">
-        {anime.image_url && (
-          <img
-            src={anime.image_url}
-            alt={anime.title}
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
-        )}
-      </div>
-      <div className="flex flex-1 flex-col gap-2">
-        <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-accent-400">Anime Favorit</div>
-          <h2 className="mt-1 text-xl font-bold text-white">{anime.title}</h2>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          <span className="pill">★ {anime.score?.toFixed(2)}</span>
-          <span className="pill">{anime.episodes} ep</span>
-          <span className="pill">{anime.type}</span>
-          <span className="pill">{anime.release_year}</span>
-          {anime.studio && <span className="pill">{anime.studio}</span>}
-        </div>
-        <div className="flex flex-wrap gap-1">
-          {anime.genres?.map((g) => (
-            <span key={g} className="rounded-md bg-accent-500/15 px-1.5 py-0.5 text-[11px] font-medium text-accent-400">
-              {g}
-            </span>
-          ))}
-        </div>
-        {anime.synopsis && <p className="text-xs leading-relaxed text-slate-400 line-clamp-4">{anime.synopsis}</p>}
-      </div>
-    </div>
-  );
-}
-
-function ExecutionBadge({ label, time, accent }) {
-  if (time == null) return null;
-  return (
-    <div className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${accent}`}>
-      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">{label}</span>
-      <span className="text-base font-bold text-white">{time.toFixed(4)} s</span>
-    </div>
-  );
-}
 
 export default function Recommendation() {
   const [params, setParams] = useSearchParams();
@@ -83,22 +35,20 @@ export default function Recommendation() {
       .catch((e) => setError(e.message));
   }, [initialId]);
 
-  const speedup = useMemo(() => {
-    if (!serial?.execution_time || !parallel?.execution_time) return null;
-    return serial.execution_time / parallel.execution_time;
-  }, [serial, parallel]);
-
-  const efficiency = useMemo(() => {
-    if (!speedup || !parallel?.num_workers) return null;
-    return speedup / parallel.num_workers;
-  }, [speedup, parallel]);
-
   const handleSelectFavorite = (anime) => {
     setFavorite(anime);
     setSerial(null);
     setParallel(null);
     setParams({ id: String(anime.id) });
   };
+
+  const handleStartNewRecommendationFlow = useCallback(() => {
+    setFavorite(null);
+    setSerial(null);
+    setParallel(null);
+    setError(null);
+    setParams({});
+  }, [setParams]);
 
   const effectiveTopN = topN && topN >= 1 ? topN : 10;
 
@@ -139,6 +89,44 @@ export default function Recommendation() {
     }
   }, [favorite, filters, effectiveTopN, numWorkers]);
 
+  const filterAndExecution = (
+    <>
+      <FilterPanel filters={filters} onChange={setFilters} meta={meta} topN={topN} onTopNChange={setTopN} />
+
+      <div className="card w-full space-y-3">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-300">Eksekusi</h3>
+        <div>
+          <label className="label">Jumlah worker (paralel)</label>
+          <select className="input" value={numWorkers} onChange={(e) => setNumWorkers(Number(e.target.value))}>
+            {[1, 2, 4, 6, 8, 12, 16].map((n) => (
+              <option key={n} value={n}>
+                {n} worker
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          className="btn-outline w-full"
+          type="button"
+          onClick={runSerial}
+          disabled={!favorite || loading.serial}
+        >
+          {loading.serial ? "Menjalankan serial..." : "Run Serial Similarity Search"}
+        </button>
+        <button
+          className="btn-primary w-full"
+          type="button"
+          onClick={runParallel}
+          disabled={!favorite || loading.parallel}
+        >
+          {loading.parallel ? "Menjalankan paralel..." : "Run Parallel Similarity Search"}
+        </button>
+      </div>
+    </>
+  );
+
+  const hasSearchResults = !!(serial || parallel);
+
   return (
     <div className="space-y-6">
       <header className="flex flex-col items-start gap-4">
@@ -153,119 +141,72 @@ export default function Recommendation() {
         </p>
       </header>
 
-      <div className="card relative z-40">
-        <SearchBar onSelect={handleSelectFavorite} placeholder="Ganti anime favorit..." />
-      </div>
+      {!hasSearchResults && (
+        <div className="card relative z-40 w-full min-w-0">
+          <SearchBar onSelect={handleSelectFavorite} placeholder="Ganti anime favorit..." />
+        </div>
+      )}
 
-      {favorite && <FavoriteCard anime={favorite} />}
+      {!favorite ? (
+        <div className="flex w-full min-w-0 flex-col gap-6">
+          {filterAndExecution}
+          {error && <div className="card w-full border-rose-500/40 text-sm text-rose-300">{error}</div>}
+          <HintStrip
+            icon={<SearchMiniIcon className="opacity-90" />}
+            title="Cari anime favoritmu"
+            description="Ketik di search bar di atas, lalu atur filter. Setelah memilih judul, jalankan Serial atau Parallel untuk melihat rekomendasi."
+          />
+        </div>
+      ) : hasSearchResults ? (
+        <div className="flex w-full min-w-0 flex-col gap-6">
+          <NewSearchBanner
+            onStartNew={handleStartNewRecommendationFlow}
+            title="Mulai alur rekomendasi dari awal"
+            description="Ganti anime acuan, atur filter, dan jalankan Serial atau Parallel lagi — tampilan akan kembali seperti sebelum hasil ditampilkan."
+            captionMobile="Kembali ke filter &amp; pencarian"
+            captionDesktop="Memuat ulang filter &amp; bilah pencarian"
+          />
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[320px_1fr]">
-        <aside className="space-y-4">
-          <FilterPanel filters={filters} onChange={setFilters} meta={meta} topN={topN} onTopNChange={setTopN} />
+          {favorite && <FavoriteCard anime={favorite} eyebrow="Anime acuan (pilihanmu)" />}
 
-          <div className="card space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-300">Eksekusi</h3>
-            <div>
-              <label className="label">Jumlah worker (paralel)</label>
-              <select
-                className="input"
-                value={numWorkers}
-                onChange={(e) => setNumWorkers(Number(e.target.value))}
-              >
-                {[1, 2, 4, 6, 8, 12, 16].map((n) => (
-                  <option key={n} value={n}>
-                    {n} worker
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              className="btn-outline w-full"
-              type="button"
-              onClick={runSerial}
-              disabled={!favorite || loading.serial}
-            >
-              {loading.serial ? "Menjalankan serial..." : "Run Serial Similarity Search"}
-            </button>
-            <button
-              className="btn-primary w-full"
-              type="button"
-              onClick={runParallel}
-              disabled={!favorite || loading.parallel}
-            >
-              {loading.parallel ? "Menjalankan paralel..." : "Run Parallel Similarity Search"}
-            </button>
-          </div>
-
-          {(serial || parallel) && (
-            <div className="card space-y-2">
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-300">Statistik</h3>
-              <div className="flex flex-col gap-2">
-                <ExecutionBadge label="Serial" time={serial?.execution_time} accent="border-neon-pink/40 bg-neon-pink/5" />
-                <ExecutionBadge
-                  label={`Paralel (${parallel?.num_workers ?? numWorkers}w)`}
-                  time={parallel?.execution_time}
-                  accent="border-accent-500/40 bg-accent-500/5"
-                />
-                {speedup != null && (
-                  <div className="rounded-xl border border-neon-lime/40 bg-neon-lime/5 px-3 py-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">Speedup</div>
-                    <div className="text-base font-bold text-white">{speedup.toFixed(2)}x</div>
-                  </div>
-                )}
-                {efficiency != null && (
-                  <div className="rounded-xl border border-neon-cyan/40 bg-neon-cyan/5 px-3 py-2">
-                    <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">Efficiency</div>
-                    <div className="text-base font-bold text-white">{(efficiency * 100).toFixed(2)}%</div>
-                  </div>
-                )}
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Dataset: {(serial?.dataset_size ?? parallel?.dataset_size ?? 0).toLocaleString("id-ID")} anime · Kandidat
-                lolos filter: {(serial?.candidate_count ?? parallel?.candidate_count ?? 0).toLocaleString("id-ID")}
-              </p>
-            </div>
-          )}
-        </aside>
-
-        <main className="space-y-6">
-          {error && <div className="card border-rose-500/40 text-sm text-rose-300">{error}</div>}
-
-          {!favorite && (
-            <div className="card text-sm text-slate-400">
-              Pilih anime favorit dengan search bar di atas untuk mulai mendapat rekomendasi.
-            </div>
-          )}
-
-          {favorite && !serial && !parallel && (
-            <div className="card text-sm text-slate-400">
-              Klik salah satu tombol di samping (Run Serial / Run Parallel) untuk menjalankan similarity search.
-            </div>
-          )}
+          {error && <div className="card w-full border-rose-500/40 text-sm text-rose-300">{error}</div>}
 
           {parallel && (
-            <section>
-              <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-white">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-500" /> Hasil Mode Paralel
+            <section className="min-w-0">
+              <h3 className="mb-3 flex flex-wrap items-center gap-2 text-base font-semibold text-white">
+                <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-accent-500" /> Hasil Mode Paralel
                 <span className="text-xs font-normal text-slate-400">
                   ({parallel.num_workers} worker · {parallel.execution_time.toFixed(4)} s)
                 </span>
               </h3>
-              <RecommendationList recommendations={parallel.recommendations} />
+              <RecommendationList recommendations={parallel.recommendations} pageSize={4} />
             </section>
           )}
 
           {serial && (
-            <section>
-              <h3 className="mb-3 flex items-center gap-2 text-base font-semibold text-white">
-                <span className="inline-block h-2.5 w-2.5 rounded-full bg-neon-pink" /> Hasil Mode Serial
+            <section className="min-w-0">
+              <h3 className="mb-3 flex flex-wrap items-center gap-2 text-base font-semibold text-white">
+                <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-neon-pink" /> Hasil Mode Serial
                 <span className="text-xs font-normal text-slate-400">({serial.execution_time.toFixed(4)} s)</span>
               </h3>
-              <RecommendationList recommendations={serial.recommendations} />
+              <RecommendationList recommendations={serial.recommendations} pageSize={4} />
             </section>
           )}
-        </main>
-      </div>
+        </div>
+      ) : (
+        <>
+          <FavoriteCard anime={favorite} />
+          <div className="flex w-full min-w-0 flex-col gap-6">
+            {filterAndExecution}
+            {error && <div className="card w-full border-rose-500/40 text-sm text-rose-300">{error}</div>}
+            <HintStrip
+              icon={<PlayMiniIcon className="opacity-90" />}
+              title="Siap menjalankan similarity search"
+              description="Gunakan Run Serial atau Run Parallel pada panel Eksekusi di atas. Setelah selesai, daftar rekomendasi muncul di halaman ini."
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

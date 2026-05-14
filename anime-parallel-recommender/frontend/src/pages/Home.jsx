@@ -72,7 +72,7 @@ export default function Home() {
         <div className="mt-9 w-full max-w-2xl">
           <SearchBar
             onSelect={(a) => navigate(`/recommend?id=${a.id}`)}
-            placeholder="Cari anime — misal: Naruto, Steins;Gate, Spy x Family..."
+            placeholder="Cari anime Kesukaan Anda - Misalkan : Naruto, Steins Gate, Spy x Family, etc"
           />
         </div>
 

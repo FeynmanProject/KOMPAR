@@ -258,7 +258,7 @@ export default function FilterPanel({ filters, onChange, meta, topN, onTopNChang
           <NumberInput
             value={filters.min_rating ?? ""}
             onChange={(v) => update("min_rating", v)}
-            placeholder="0 - 10"
+            placeholder="Kosong = min 0 · isi mis. 7"
             min={0}
             max={10}
             step={0.1}
@@ -273,6 +273,7 @@ export default function FilterPanel({ filters, onChange, meta, topN, onTopNChang
             onChange={(v) => update("max_episodes", v)}
             min={0}
             step={1}
+            placeholder="Kosong = semua · isi mis. 24"
           />
         </div>
 
@@ -313,7 +314,11 @@ export default function FilterPanel({ filters, onChange, meta, topN, onTopNChang
           <NumberInput
             value={filters.start_year ?? ""}
             onChange={(v) => update("start_year", v)}
-            placeholder={meta?.min_year ?? ""}
+            placeholder={
+              meta?.min_year != null && meta?.max_year != null
+                ? `Kosong = semua · min ${meta.min_year}–${meta.max_year}`
+                : "Kosong = semua · tahun minimal"
+            }
             min={meta?.min_year ?? 1960}
             max={meta?.max_year ?? new Date().getFullYear()}
             step={1}
@@ -325,7 +330,11 @@ export default function FilterPanel({ filters, onChange, meta, topN, onTopNChang
           <NumberInput
             value={filters.end_year ?? ""}
             onChange={(v) => update("end_year", v)}
-            placeholder={meta?.max_year ?? ""}
+            placeholder={
+              meta?.min_year != null && meta?.max_year != null
+                ? `Kosong = semua · max ${meta.min_year}–${meta.max_year}`
+                : "Kosong = semua · tahun maksimal"
+            }
             min={meta?.min_year ?? 1960}
             max={meta?.max_year ?? new Date().getFullYear()}
             step={1}

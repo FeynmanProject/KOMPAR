@@ -8,12 +8,14 @@ pencarian similarity secara **serial** vs **paralel multiprocessing**, lengkap d
 dan grafik **speedup** + **efficiency**. Frontend dirancang dengan design language modern
 bertema gelap, animated WebGL background, dan glass-morphism UI.
 
-Cara menjalankan Backend dan Frontend :
+Cara menjalankan Backend dan Frontend (setelah clone):
+
+```bash
 # Backend
 cd anime-parallel-recommender/backend
-python -m venv .venv && source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python preprocessing.py --target-size 10000
+python preprocessing.py --target-size 0              # wajib sekali: isi anime.db dari dataset/anime.csv (~17k anime asli)
 uvicorn main:app --reload --port 8000
 
 # Frontend (terminal terpisah)
@@ -21,6 +23,11 @@ cd anime-parallel-recommender/frontend
 npm install
 npm run dev
 # buka http://localhost:5173
+```
+
+> **Clone baru:** `dataset/anime.csv` sudah ada di repo — cukup jalankan `preprocessing.py --target-size 0`.
+> Jangan pakai `--target-size 10000` kecuali sengaja ingin menambah baris palsu `[synthetic-N]` untuk eksperimen.
+> Rebuild dataset dari dump MAL: lihat [§4.2](#42-backend) (`merge_datasets.py`).
 
 ---
 
@@ -73,7 +80,8 @@ anime-parallel-recommender/
 │   ├── serial_engine.py     # Serial similarity search
 │   ├── parallel_engine.py   # Parallel similarity search (ProcessPoolExecutor)
 │   ├── benchmark.py         # Harness serial vs parallel
-│   ├── preprocessing.py     # Loader CSV → SQLite + sintesa benchmark
+│   ├── merge_datasets.py    # Gabung dump MAL → dataset/anime.csv (opsional)
+│   ├── preprocessing.py     # Loader CSV → SQLite (opsional: sintesis benchmark)
 │   ├── anime.db             # Dibuat otomatis oleh preprocessing.py
 │   └── requirements.txt
 ├── frontend/
@@ -98,7 +106,9 @@ anime-parallel-recommender/
 │   ├── vite.config.js
 │   └── package.json
 ├── dataset/
-│   └── anime.csv            # Dataset awal (150 anime nyata)
+│   ├── anime.csv            # Dataset gabungan (~17k anime nyata, hasil merge)
+│   ├── anime.sample-150.csv # Contoh kecil (backup)
+│   └── raw/                 # Sumber: anime.csv + AnimeList.csv (tidak di-commit)
 ├── README.md                # File ini
 └── laporan-ringkas.md
 ```
@@ -123,10 +133,14 @@ source .venv/bin/activate          # Linux/macOS
 # 2. Install dependency
 pip install -r requirements.txt
 
-# 3. Preprocessing dataset (mengisi SQLite)
-#    Secara default sistem mensintesa dataset hingga ~10.000 anime untuk
-#    membuktikan efek paralelisasi. Atur dengan --target-size.
-python preprocessing.py --target-size 10000
+# 3. Preprocessing dataset (wajib setelah clone — membuat backend/anime.db)
+#    Membaca ../dataset/anime.csv yang sudah ada di repo (~17.600 judul asli).
+python preprocessing.py --target-size 0
+
+# (Opsional) Rebuild dataset/anime.csv dari dump MAL:
+#    Ekstrak anime.csv + AnimeList.csv ke ../dataset/raw/, lalu:
+# python merge_datasets.py
+# python preprocessing.py --target-size 0
 
 # 4. Jalankan backend FastAPI
 uvicorn main:app --reload --port 8000
@@ -134,9 +148,9 @@ uvicorn main:app --reload --port 8000
 
 API tersedia di `http://localhost:8000`. Dokumentasi interaktif Swagger ada di `http://localhost:8000/docs`.
 
-> **Catatan paralelisasi:** dataset 10.000+ anime dibutuhkan agar selisih waktu serial vs paralel
-> terlihat signifikan. Untuk dataset yang lebih kecil, overhead spawn proses bisa melebihi
-> keuntungan paralelisasi. Sintesa data ditandai dengan suffix `[synthetic-N]` pada judul.
+> **Catatan paralelisasi:** dengan ~17k anime asli, selisih waktu serial vs paralel sudah terlihat jelas.
+> Opsional: `--target-size 10000` hanya jika `anime.csv` kecil dan ingin menambah baris sintetis
+> `[synthetic-N]` untuk skala benchmark — tidak dipakai di setup default.
 
 ### 4.3 Frontend
 

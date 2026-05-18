@@ -11,6 +11,7 @@ from __future__ import annotations
 from sqlalchemy import Column, Float, Integer, String, Text
 
 from database import Base
+from image_urls import normalize_image_url
 
 
 class Anime(Base):
@@ -42,5 +43,5 @@ class Anime(Base):
             "release_year": self.release_year,
             "status": self.status,
             "synopsis": self.synopsis,
-            "image_url": self.image_url,
+            "image_url": normalize_image_url(self.image_url),
         }

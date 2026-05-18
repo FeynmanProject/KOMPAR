@@ -8,26 +8,47 @@ pencarian similarity secara **serial** vs **paralel multiprocessing**, lengkap d
 dan grafik **speedup** + **efficiency**. Frontend dirancang dengan design language modern
 bertema gelap, animated WebGL background, dan glass-morphism UI.
 
-Cara menjalankan Backend dan Frontend (setelah clone):
+**Prasyarat:** Python ≥ 3.10, Node.js ≥ 18. Butuh **dua terminal** — backend dulu, baru frontend.
+
+### Terminal 1 — Backend (wajib jalan dulu)
 
 ```bash
-# Backend
 cd anime-parallel-recommender/backend
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python preprocessing.py --target-size 0              # wajib sekali: isi anime.db dari dataset/anime.csv (~17k anime asli)
-uvicorn main:app --reload --port 8000
 
-# Frontend (terminal terpisah)
-cd anime-parallel-recommender/frontend
-npm install
-npm run dev
-# buka http://localhost:5173
+python -m venv .venv
+source .venv/bin/activate          # macOS/Linux
+# .venv\Scripts\activate           # Windows (PowerShell/CMD)
+
+pip install -r requirements.txt
+
+# Sekali setelah clone: buat backend/anime.db dari dataset/anime.csv (~17k anime)
+# File anime.db TIDAK ada di Git — langkah ini wajib.
+python preprocessing.py --target-size 0
+
+uvicorn main:app --reload --port 8000
 ```
 
-> **Clone baru:** `dataset/anime.csv` sudah ada di repo — cukup jalankan `preprocessing.py --target-size 0`.
-> Jangan pakai `--target-size 10000` kecuali sengaja ingin menambah baris palsu `[synthetic-N]` untuk eksperimen.
-> Rebuild dataset dari dump MAL: lihat [§4.2](#42-backend) (`merge_datasets.py`).
+Cek backend: buka http://localhost:8000/docs — harus tampil Swagger. Kalau gagal, frontend akan error `ECONNREFUSED`.
+
+### Terminal 2 — Frontend
+
+```bash
+cd anime-parallel-recommender/frontend
+npm install                        # wajib sekali (termasuk @paper-design/shaders-react)
+npm run dev
+```
+
+Buka http://localhost:5173 — Vite mem-proxy request API ke `localhost:8000`.
+
+### Catatan untuk tim
+
+| Topik | Penjelasan |
+|--------|------------|
+| **Dataset** | `dataset/anime.csv` sudah di repo. Jangan pakai `--target-size 10000` (menambah baris palsu `[synthetic-N]`). |
+| **Preprocessing ulang** | Hanya jika `anime.csv` berubah atau `anime.db` hilang. |
+| **Gambar poster** | URL lama CDN otomatis dinormalisasi ke `cdn.myanimelist.net`; ~18% judul memang tanpa gambar di sumber. |
+| **Merge dump MAL** | Opsional — lihat [§4.2](#42-backend) (`merge_datasets.py`). |
+| **Detail lengkap** | [§4. Cara menjalankan](#4-cara-menjalankan) |
 
 ---
 

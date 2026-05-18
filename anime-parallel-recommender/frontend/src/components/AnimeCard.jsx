@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from "react";
 import { useThemeAttribute } from "../lib/useTheme.js";
+import AnimePoster from "./AnimePoster.jsx";
 
 /**
  * Circular similarity-percentage indicator.
@@ -141,17 +142,12 @@ function DetailModal({ recommendation, onClose }) {
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr]">
           <div className="relative h-72 w-full overflow-hidden rounded-2xl bg-ink-800 md:h-auto md:max-h-[280px]">
-            {anime.image_url ? (
-              // eslint-disable-next-line jsx-a11y/img-redundant-alt
-              <img
-                src={anime.image_url}
-                alt={`Poster ${anime.title}`}
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ) : null}
+            <AnimePoster
+              src={anime.image_url}
+              alt={`Poster ${anime.title}`}
+              className="h-full w-full object-cover"
+              loading="eager"
+            />
           </div>
 
           <div className="flex min-w-0 flex-col gap-4">
@@ -248,18 +244,11 @@ export default function AnimeCard({ recommendation, rank }) {
         {/* TOP — poster + (title + score) + meta pills */}
         <div className="flex gap-4">
           <div className="relative h-40 w-28 shrink-0 overflow-hidden rounded-xl bg-ink-800">
-            {anime.image_url ? (
-              // eslint-disable-next-line jsx-a11y/img-redundant-alt
-              <img
-                src={anime.image_url}
-                alt={`Poster ${anime.title}`}
-                loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ) : null}
+            <AnimePoster
+              src={anime.image_url}
+              alt={`Poster ${anime.title}`}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
             {typeof rank === "number" && (
               <span className="absolute left-1 top-1 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] font-bold text-white">
                 #{rank}

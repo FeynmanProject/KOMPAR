@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import AnimePoster from "./AnimePoster.jsx";
 import animeApi from "../api/animeApi.js";
 
 export default function SearchBar({ onSelect, placeholder = "Cari judul anime favoritmu..." }) {
@@ -83,16 +84,7 @@ export default function SearchBar({ onSelect, placeholder = "Cari judul anime fa
               className="flex w-full items-center gap-3 border-b border-white/5 px-3 py-2 text-left transition-colors hover:bg-white/5"
             >
               <div className="h-12 w-9 shrink-0 overflow-hidden rounded bg-ink-800">
-                {a.image_url && (
-                  <img
-                    src={a.image_url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-                )}
+                <AnimePoster src={a.image_url} alt="" className="h-full w-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-white">{a.title}</div>

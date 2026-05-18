@@ -1,20 +1,12 @@
 import React from "react";
+import AnimePoster from "./AnimePoster.jsx";
 
 export default function FavoriteCard({ anime, eyebrow = "Anime Favorit" }) {
   if (!anime) return null;
   return (
     <div className="card flex gap-4">
       <div className="h-44 w-32 shrink-0 overflow-hidden rounded-xl bg-ink-800">
-        {anime.image_url && (
-          <img
-            src={anime.image_url}
-            alt={anime.title}
-            className="h-full w-full object-cover"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-            }}
-          />
-        )}
+        <AnimePoster src={anime.image_url} alt={anime.title} className="h-full w-full object-cover" />
       </div>
       <div className="flex flex-1 flex-col gap-2">
         <div>

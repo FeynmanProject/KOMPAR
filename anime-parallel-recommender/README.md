@@ -64,7 +64,7 @@ Buka http://localhost:5173 — Vite mem-proxy request API ke `localhost:8000`.
 8. [Contoh hasil benchmark](#8-contoh-hasil-benchmark)
 9. [API reference](#9-api-reference)
 10. [Tampilan & UX frontend](#10-tampilan--ux-frontend)
-11. [Deploy publik (Render + Vercel)](#11-deploy-publik-render--vercel)
+11. [Deploy publik](#11-deploy-publik) — [tanpa kartu: HF + Vercel](#117-tanpa-kartu--hugging-face--vercel)
 
 ---
 
@@ -414,35 +414,58 @@ rekomendasi.
 
 ---
 
-## 11. Deploy publik (Render + Vercel)
+## 11. Deploy publik
 
-Website ini bisa diakses publik dengan **backend di Render** (gratis) dan **frontend di Vercel** (gratis).
-Urutan penting: **backend dulu**, baru frontend.
+Website bisa diakses **tanpa laptop menyala**. Urutan: **backend dulu**, baru frontend.
 
-File konfigurasi sudah disiapkan di repo:
+| Situasi Anda | Backend | Frontend |
+|--------------|---------|----------|
+| **Tidak punya kartu** | [§11.7 Hugging Face Spaces](#117-tanpa-kartu--hugging-face--vercel) | Vercel (gratis) |
+| **Punya kartu (verifikasi Render)** | [§11.1 Render](#111-backend--render) | [§11.2 Vercel](#112-frontend--vercel) |
+| **Demo singkat, laptop nyala** | Cloudflare Tunnel (lihat diskusi di tim) | — |
+
+File konfigurasi di repo:
 
 | File | Fungsi |
 |------|--------|
-| `render.yaml` (root repo) | Blueprint backend untuk Render |
-| `backend/runtime.txt` | Python 3.11 |
-| `frontend/vercel.json` | SPA routing (`/recommend`, `/benchmark`, dll.) |
+| `Dockerfile` (root **KOMPAR**) | Backend untuk Hugging Face Spaces |
+| `README.md` (root **KOMPAR**) | Metadata Space (YAML) untuk Hugging Face |
+| `render.yaml` (root **KOMPAR**) | Opsional — Render Blueprint |
+| `backend/runtime.txt` | Python 3.11 (Render) |
+| `frontend/vercel.json` | SPA routing |
 | `frontend/.env.example` | Contoh `VITE_API_BASE` |
 
 ### 11.1 Backend — Render
 
+> **Render minta kartu kredit?** Banyak akun baru (Blueprint **dan** Web Service manual) wajib verifikasi kartu dulu — otorisasi sementara ~**$1 USD**, lalu dibatalkan; **bukan** tagihan bulanan selama instance tetap **Free** dan Anda tidak upgrade plan.
+>
+> **Tanpa kartu sama sekali:** Render biasanya tidak bisa dipakai. Lihat [§11.6 Alternatif backend tanpa kartu](#116-alternatif-backend-tanpa-kartu-render) atau host backend lain (Koyeb, PythonAnywhere).
+
 1. Push seluruh repo **KOMPAR** ke GitHub (harus ada `dataset/anime.csv`).
 2. Buka https://render.com → sign in dengan GitHub.
-3. **New → Blueprint** → pilih repo → Render membaca `render.yaml` di root.
-4. Konfirmasi service `anime-recommender-api` → **Apply**.
-5. Tunggu deploy selesai (build menjalankan `preprocessing.py` → membuat `anime.db`).
+3. **New → Web Service** (bukan Blueprint) → connect repo **KOMPAR**.
+4. Isi form:
+
+| Field | Nilai |
+|--------|--------|
+| **Name** | `anime-recommender-api` (bebas) |
+| **Region** | Singapore (atau terdekat) |
+| **Branch** | `main` |
+| **Root Directory** | `anime-parallel-recommender/backend` |
+| **Runtime** | Python 3 |
+| **Build Command** | `pip install -r requirements.txt && python preprocessing.py --target-size 0` |
+| **Start Command** | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| **Instance Type** | **Free** |
+
+5. **Create Web Service** → tunggu deploy (build membuat `anime.db` dari CSV).
 6. Catat URL publik, misalnya `https://anime-recommender-api.onrender.com`.
 7. Tes:
    - `https://.../docs` — Swagger harus tampil
    - `https://.../anime/meta/dataset` — JSON dengan `dataset_size` ~17600
 
-**Tanpa Blueprint (manual):** New → Web Service → root directory `anime-parallel-recommender/backend`, build command dan start command sama seperti di `render.yaml`.
+**Opsional — Blueprint:** **New → Blueprint** + file `render.yaml` di root repo. Sama konfigurasinya, tapi sering **wajib** verifikasi kartu dulu.
 
-**Tier gratis:** service tidur setelah ~15 menit tidak dipakai; buka pertama kali bisa lambat 30–60 detik.
+**Tier gratis:** service tidur setelah ~15 menit tidak dipakai; buka pertama kali bisa lambat 30–60 detik. Jangan upgrade ke plan berbayar di dashboard.
 
 ### 11.2 Frontend — Vercel
 
@@ -493,6 +516,65 @@ Buka URL yang ditampilkan `vite preview` (biasanya http://localhost:4173).
 | `/recommend` 404 di Vercel | Pastikan `frontend/vercel.json` ikut ter-commit |
 | Parallel sangat lambat | Normal di tier gratis (RAM/CPU terbatas); kurangi worker di UI |
 | Gambar poster tidak tampil | Bukan deploy — sebagian URL kosong di sumber data; CDN MAL kadang diblokir browser |
+
+### 11.7 Tanpa kartu — Hugging Face + Vercel
+
+**Tidak perlu kartu kredit.** Laptop boleh mati setelah deploy. Backend jalan di server Hugging Face; UI di Vercel.
+
+#### A. Backend — Hugging Face Spaces
+
+1. Daftar gratis: https://huggingface.co/join (email saja, tanpa kartu).
+2. Push repo **KOMPAR** ke GitHub (harus ada `dataset/anime.csv` + `Dockerfile` di root repo).
+3. Buka https://huggingface.co/new-space
+4. Isi:
+   - **Space name** — mis. `anime-recommender-api`
+   - **License** — MIT (atau sesuai tim)
+   - **Space SDK** — **Docker**
+   - **Space hardware** — **CPU basic** (gratis)
+5. Setelah Space dibuat → tab **Settings** → **Repository** → **Link to existing repository**:
+   - Repo: `FeynmanProject/KOMPAR` (repo Anda)
+   - Branch: `main`
+6. Hugging Face membaca `Dockerfile` + `README.md` (YAML) di **root repo** → build otomatis (10–20 menit pertama kali).
+7. Setelah status **Running**, catat URL Space, misalnya:
+   `https://USERNAME-anime-recommender-api.hf.space`
+8. Tes di browser:
+   - `https://.../docs`
+   - `https://.../anime/meta/dataset`
+
+**Catatan tier gratis HF:** Space bisa **sleep** jika idle; buka pertama kali bisa lambat. Mode parallel mungkin lebih lambat (CPU terbatas).
+
+#### B. Frontend — Vercel
+
+1. https://vercel.com → import repo **KOMPAR** (login GitHub, tanpa kartu untuk hobby).
+2. Root Directory: `anime-parallel-recommender/frontend`
+3. Environment variable (Production):
+
+```env
+VITE_API_BASE=https://USERNAME-anime-recommender-api.hf.space
+```
+
+Ganti dengan URL Hugging Face Anda (**tanpa** slash di akhir, **tanpa** `/api`).
+
+4. Deploy → buka URL Vercel → tes halaman **Rekomendasi**.
+
+#### C. Setelah deploy
+
+| Cek | Harus |
+|-----|--------|
+| Backend `/docs` | Swagger tampil |
+| Frontend halaman Rekomendasi | Dataset ~17k ter-load |
+| Laptop mati | Situs tetap bisa dibuka (mungkin cold start) |
+
+### 11.6 Lainnya
+
+| Platform | Kartu | Catatan |
+|----------|-------|---------|
+| **Hugging Face Spaces** | Tidak | **Disarankan tanpa kartu** — lihat §11.7 |
+| **Render / Koyeb** | Verifikasi kartu | Paling mudah jika punya kartu debit |
+| **Cloudflare Tunnel** | Tidak | Laptop **harus** nyala |
+| **PythonAnywhere** | Tidak | FastAPI/ASGI tidak didukung baik |
+
+**Health check di Render:** kosongkan atau isi `/` (bukan `/healthz`).
 
 ### 11.5 Frontend host lain
 

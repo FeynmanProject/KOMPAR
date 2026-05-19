@@ -1,0 +1,11 @@
+.git
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/node_modules
+anime-parallel-recommender/frontend
+anime-parallel-recommender/dataset/raw
+**/*.db
+**/*.db-journal
+.DS_Store

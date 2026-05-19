@@ -64,6 +64,7 @@ Buka http://localhost:5173 — Vite mem-proxy request API ke `localhost:8000`.
 8. [Contoh hasil benchmark](#8-contoh-hasil-benchmark)
 9. [API reference](#9-api-reference)
 10. [Tampilan & UX frontend](#10-tampilan--ux-frontend)
+11. [Deploy publik (Render + Vercel)](#11-deploy-publik-render--vercel)
 
 ---
 
@@ -410,6 +411,96 @@ rekomendasi.
 - **Browser title** — `Anime Recommender`.
 - **Brand di nav** — sparkle inline (versi tanpa glow) + teks *"Anime"* (A italik, "nime"
   upright, font Instrument Serif).
+
+---
+
+## 11. Deploy publik (Render + Vercel)
+
+Website ini bisa diakses publik dengan **backend di Render** (gratis) dan **frontend di Vercel** (gratis).
+Urutan penting: **backend dulu**, baru frontend.
+
+File konfigurasi sudah disiapkan di repo:
+
+| File | Fungsi |
+|------|--------|
+| `render.yaml` (root repo) | Blueprint backend untuk Render |
+| `backend/runtime.txt` | Python 3.11 |
+| `frontend/vercel.json` | SPA routing (`/recommend`, `/benchmark`, dll.) |
+| `frontend/.env.example` | Contoh `VITE_API_BASE` |
+
+### 11.1 Backend — Render
+
+1. Push seluruh repo **KOMPAR** ke GitHub (harus ada `dataset/anime.csv`).
+2. Buka https://render.com → sign in dengan GitHub.
+3. **New → Blueprint** → pilih repo → Render membaca `render.yaml` di root.
+4. Konfirmasi service `anime-recommender-api` → **Apply**.
+5. Tunggu deploy selesai (build menjalankan `preprocessing.py` → membuat `anime.db`).
+6. Catat URL publik, misalnya `https://anime-recommender-api.onrender.com`.
+7. Tes:
+   - `https://.../docs` — Swagger harus tampil
+   - `https://.../anime/meta/dataset` — JSON dengan `dataset_size` ~17600
+
+**Tanpa Blueprint (manual):** New → Web Service → root directory `anime-parallel-recommender/backend`, build command dan start command sama seperti di `render.yaml`.
+
+**Tier gratis:** service tidur setelah ~15 menit tidak dipakai; buka pertama kali bisa lambat 30–60 detik.
+
+### 11.2 Frontend — Vercel
+
+1. Buka https://vercel.com → import repo GitHub yang sama.
+2. Pengaturan project:
+
+| Field | Nilai |
+|--------|--------|
+| **Root Directory** | `anime-parallel-recommender/frontend` |
+| **Framework Preset** | Vite |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `dist` |
+
+3. **Environment Variables** → Production:
+
+```env
+VITE_API_BASE=https://anime-recommender-api.onrender.com
+```
+
+Ganti dengan URL Render Anda (**tanpa** `/api` di akhir).
+
+4. Deploy → buka URL Vercel (mis. `https://nama-proyek.vercel.app`).
+5. Cek halaman **Rekomendasi** — metadata dataset harus ter-load.
+
+### 11.3 Uji build production di laptop (opsional)
+
+```bash
+# Terminal 1 — backend
+cd anime-parallel-recommender/backend
+source .venv/bin/activate
+uvicorn main:app --port 8000
+
+# Terminal 2 — frontend menunjuk ke backend lokal
+cd anime-parallel-recommender/frontend
+cp .env.example .env.local
+# edit .env.local: VITE_API_BASE=http://localhost:8000
+npm run build && npm run preview
+```
+
+Buka URL yang ditampilkan `vite preview` (biasanya http://localhost:4173).
+
+### 11.4 Troubleshooting deploy
+
+| Gejala | Penyebab / solusi |
+|--------|-------------------|
+| Frontend `Failed to fetch` / dataset kosong | `VITE_API_BASE` salah atau backend belum hidup; redeploy frontend setelah mengubah env |
+| Build Render gagal | Pastikan `dataset/anime.csv` ada di Git; lihat log build |
+| `/recommend` 404 di Vercel | Pastikan `frontend/vercel.json` ikut ter-commit |
+| Parallel sangat lambat | Normal di tier gratis (RAM/CPU terbatas); kurangi worker di UI |
+| Gambar poster tidak tampil | Bukan deploy — sebagian URL kosong di sumber data; CDN MAL kadang diblokir browser |
+
+### 11.5 Frontend host lain
+
+Vercel tidak wajib. Host static apa pun (Netlify, Cloudflare Pages, Render Static Site) cukup asal:
+
+- Build: `npm run build`, publish folder `dist`
+- Env: `VITE_API_BASE=<URL backend Render>`
+- SPA fallback ke `index.html` (Netlify: `public/_redirects` dengan `/* /index.html 200`)
 
 ---
 

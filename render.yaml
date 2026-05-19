@@ -1,0 +1,16 @@
+# Render Blueprint — backend API (FastAPI + SQLite)
+# Repo root: KOMPAR. Connect this repo in Render → New → Blueprint.
+# Frontend: deploy separately on Vercel (see anime-parallel-recommender/README.md § Deploy).
+
+services:
+  - type: web
+    name: anime-recommender-api
+    runtime: python
+    plan: free
+    rootDir: anime-parallel-recommender/backend
+    buildCommand: pip install -r requirements.txt && python preprocessing.py --target-size 0
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"

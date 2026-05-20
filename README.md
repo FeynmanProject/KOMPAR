@@ -1,8 +1,8 @@
 ---
 title: Anime Parallel Recommender API
 emoji: 🎌
-colorFrom: violet
-colorTo: purple
+colorFrom: purple
+colorTo: indigo
 sdk: docker
 app_port: 7860
 pinned: false

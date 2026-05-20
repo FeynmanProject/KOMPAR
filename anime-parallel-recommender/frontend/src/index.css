@@ -3,28 +3,36 @@
 @tailwind utilities;
 
 @layer base {
-  html,
-  body,
-  #root {
-    height: 100%;
-  }
+  html, body, #root { height: 100%; }
   html {
     background: #000000;
     overflow-x: hidden;
-    overflow-y: hidden; /* keep html from becoming a second scroller */
+    overflow-y: auto;
   }
   body {
     font-family: "Inter", system-ui, sans-serif;
     background: transparent;
     color: #e7e7ea;
-    min-height: 100%;
+    min-height: 100vh;
     overflow-x: hidden;
-    overflow-y: auto; /* single vertical scroll container */
+    overflow-y: auto;
   }
   #root {
-    min-height: 100%;
+    min-height: 100vh;
     overflow-x: hidden;
     overflow-y: visible;
+  }
+  /* Hide scrollbar visuals, keep wheel/trackpad scrolling functional. */
+  html,
+  body {
+    scrollbar-width: none;      /* Firefox */
+    -ms-overflow-style: none;   /* old Edge/IE */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;              /* Chromium/Safari */
   }
   ::selection {
     background: rgba(124, 58, 237, 0.35);
@@ -33,9 +41,8 @@
 }
 
 @media (max-width: 767px) {
-  html {
-    overflow-y: hidden;
-  }
+  html,
+  body { overflow-y: auto; }
 }
 
 /* Force semantic <main> to never become an independent scroll container.

@@ -11,6 +11,7 @@
   html {
     background: #000000;
     overflow-x: hidden;
+    overflow-y: auto;
   }
   body {
     font-family: "Inter", system-ui, sans-serif;
@@ -18,6 +19,7 @@
     color: #e7e7ea;
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: visible;
   }
   #root {
     overflow-x: hidden;
@@ -25,6 +27,13 @@
   ::selection {
     background: rgba(124, 58, 237, 0.35);
     color: #fff;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-y: auto;
   }
 }
 

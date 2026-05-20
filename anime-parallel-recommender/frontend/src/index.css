@@ -26,6 +26,20 @@
     overflow-x: hidden;
     overflow-y: visible;
   }
+  /* Keep a single page scroll behavior and never show native scrollbar UI. */
+  html,
+  body,
+  #root {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* old Edge/IE */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  #root::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Chromium/WebKit */
+  }
   ::selection {
     background: rgba(124, 58, 237, 0.35);
     color: #fff;
@@ -36,19 +50,6 @@
   html,
   body {
     overflow-y: auto;
-  }
-}
-
-@media (min-width: 768px) {
-  /* Desktop/laptop: hide scrollbar visuals only for the page scroller
-     while keeping wheel/trackpad scrolling behavior normal. */
-  body {
-    scrollbar-width: none; /* Firefox */
-  }
-  body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none; /* Chromium/WebKit */
   }
 }
 
@@ -300,21 +301,6 @@
 .anim-float-b { animation: float-b 18s ease-in-out infinite; }
 .anim-float-c { animation: float-c 12s ease-in-out infinite; }
 .anim-spin-slow { animation: spin-slow 40s linear infinite; }
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(124, 58, 237, 0.35);
-  border-radius: 8px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 58, 237, 0.55);
-}
 
 /* ────────────────────────────────────────────────────────────
    LIGHT-MODE OVERRIDES — strict monochrome (no purple, no cream)
@@ -615,15 +601,7 @@ html[data-theme="light"] ::selection {
 }
 
 /* ── Scrollbar on light surface ─────────────────────────── */
-html[data-theme="light"] ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
-}
-html[data-theme="light"] ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.28);
-}
-html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.48);
-}
+/* Scrollbar visuals intentionally hidden globally; no theme-specific styling. */
 
 /* ── Brand sparkle SVG ───────────────────────────────────
    The logo's `linearGradient` uses hard-coded violet stops we can't

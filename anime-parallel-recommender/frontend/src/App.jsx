@@ -94,21 +94,21 @@ function NavItem({ to, children }) {
 function Brand({ theme, onToggleTheme }) {
   const isLight = theme === "light";
   return (
-    <div className="flex items-center gap-3 pl-2 pr-2">
+    <div className="flex shrink-0 items-center gap-1.5 pl-1 pr-0.5 md:gap-3 md:pl-2 md:pr-2">
       <button
         type="button"
         onClick={onToggleTheme}
         aria-label={isLight ? "Aktifkan dark mode" : "Aktifkan light mode"}
         title={isLight ? "Aktifkan dark mode" : "Aktifkan light mode"}
-        className="brand-theme-toggle flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-out hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60"
+        className="brand-theme-toggle flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-out hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60 md:h-7 md:w-7"
       >
         <svg
-          width="20"
-          height="20"
+          width="16"
+          height="16"
           viewBox="0 0 32 32"
           fill="none"
           aria-hidden="true"
-          className="shrink-0"
+          className="h-4 w-4 shrink-0 md:h-5 md:w-5"
         >
           <defs>
             <linearGradient id="brand-sparkle" x1="0" y1="0" x2="1" y2="1">
@@ -128,7 +128,7 @@ function Brand({ theme, onToggleTheme }) {
           />
         </svg>
       </button>
-      <NavLink to="/" className="font-display text-[20px] leading-none text-white">
+      <NavLink to="/" className="shrink-0 font-display text-[17px] leading-none text-white md:text-[20px]">
         <span className="italic">A</span>nime
       </NavLink>
     </div>
@@ -140,22 +140,22 @@ export default function App() {
   const { theme, toggle } = useTheme();
   useSplashLifecycle();
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen overflow-x-hidden">
       <ScrollToTop />
       <AmbientBackdrop theme={theme} />
-      <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
-        <div className="nav-pill">
+      <header className="fixed inset-x-0 top-2 z-50 flex justify-center px-2 md:top-4 md:px-4">
+        <div className="nav-pill w-full max-w-[calc(100vw-1rem)] md:w-auto md:max-w-none">
           <Brand theme={theme} onToggleTheme={toggle} />
-          <nav className="flex items-center gap-0.5">
+          <nav className="flex min-w-0 flex-1 items-center justify-center gap-0 md:flex-none md:justify-start">
             <NavItem to="/">Home</NavItem>
             <NavItem to="/recommend">Rekomendasi</NavItem>
             <NavItem to="/benchmark">Benchmark</NavItem>
           </nav>
-          <div className="ml-2 flex items-center gap-1.5">
+          <div className="ml-0.5 flex shrink-0 items-center gap-1 md:ml-2 md:gap-1.5">
             <button
               type="button"
               onClick={() => navigate("/about")}
-              className="hidden rounded-full border border-white/[0.1] px-3.5 py-1.5 text-[13px] font-medium text-slate-200 transition-all duration-300 ease-out hover:bg-white/[0.05] hover:scale-[1.03] sm:inline-block"
+              className="hidden rounded-full border border-white/[0.1] px-3.5 py-1.5 text-[13px] font-medium text-slate-200 transition-all duration-300 ease-out hover:bg-white/[0.05] hover:scale-[1.03] md:inline-block"
             >
               Cara kerja
             </button>
@@ -166,7 +166,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-28 md:px-8">
+      <main className="mx-auto max-w-6xl overflow-x-hidden px-4 pb-16 pt-24 md:px-8 md:pt-28">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/recommend" element={<Recommendation />} />

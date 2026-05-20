@@ -45,18 +45,18 @@ export default function Home() {
   const datasetLabel = meta ? meta.dataset_size.toLocaleString("id-ID") : "...";
 
   return (
-    <div className="space-y-24">
+    <div className="space-y-24 overflow-x-hidden">
       {/* HERO */}
-      <section className="relative flex flex-col items-center pt-6 text-center">
+      <section className="relative flex w-full max-w-full flex-col items-center overflow-x-hidden pt-6 text-center">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-32 -z-10 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-accent-500/20 blur-[140px]"
+          className="pointer-events-none absolute left-1/2 top-24 -z-10 h-[min(100vw,320px)] w-[min(100vw,320px)] -translate-x-1/2 rounded-full bg-accent-500/20 blur-[80px] md:top-32 md:h-[520px] md:w-[520px] md:blur-[140px]"
         />
         <span className="pill pill-dot">
           {meta ? `${datasetLabel} anime siap direkomendasikan` : "Memuat dataset..."}
         </span>
 
-        <h1 className="display-heading mt-7 text-[56px] leading-[1.02] md:text-[80px] lg:text-[96px]">
+        <h1 className="display-heading mt-7 max-w-full px-2 text-[2.35rem] leading-[1.05] sm:text-[56px] md:px-0 md:text-[80px] md:leading-[1.02] lg:text-[96px]">
           Temukan anime <span className="emphasis">favoritmu</span>,
           <br />
           dipercepat <span className="italic">paralel.</span>
@@ -72,7 +72,7 @@ export default function Home() {
         <div className="mt-9 w-full max-w-2xl">
           <SearchBar
             onSelect={(a) => navigate(`/recommend?id=${a.id}`)}
-            placeholder="Cari anime Kesukaan Anda - Misalkan : Naruto, Steins Gate, Spy x Family, etc"
+            placeholder="Cari anime favorit — mis. Naruto, Spy x Family"
           />
         </div>
 

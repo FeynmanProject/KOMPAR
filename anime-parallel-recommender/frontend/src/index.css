@@ -10,12 +10,17 @@
   }
   html {
     background: #000000;
+    overflow-x: hidden;
   }
   body {
     font-family: "Inter", system-ui, sans-serif;
     background: transparent;
     color: #e7e7ea;
     min-height: 100vh;
+    overflow-x: hidden;
+  }
+  #root {
+    overflow-x: hidden;
   }
   ::selection {
     background: rgba(124, 58, 237, 0.35);
@@ -169,7 +174,7 @@
 
   /* nav */
   .nav-pill {
-    @apply flex items-center gap-1 rounded-full px-2 py-1.5 transition-all duration-300;
+    @apply flex max-w-full flex-nowrap items-center gap-1 rounded-full px-2 py-1.5 transition-all duration-300;
     background-color: rgba(10, 10, 14, 0.55);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -192,9 +197,25 @@
     @apply text-white bg-white/[0.08];
   }
   .nav-cta {
-    @apply rounded-full bg-accent-500 px-3.5 py-1.5 text-[13px] font-medium text-white
+    @apply shrink-0 rounded-full bg-accent-500 px-3.5 py-1.5 text-[13px] font-medium text-white
            shadow-glow transition-all duration-300 ease-out
            hover:bg-accent-400 hover:scale-[1.03] active:scale-[0.97];
+  }
+
+  @media (max-width: 767px) {
+    .nav-pill {
+      @apply gap-0 px-1 py-0.5;
+      max-width: calc(100vw - 1rem);
+    }
+    .nav-link {
+      @apply px-2 py-1 text-[11px];
+    }
+    .nav-link-active {
+      @apply px-2 py-1;
+    }
+    .nav-cta {
+      @apply px-2.5 py-1 text-[11px] hover:scale-100 active:scale-100;
+    }
   }
 
   /* interactive stat card (glass) */

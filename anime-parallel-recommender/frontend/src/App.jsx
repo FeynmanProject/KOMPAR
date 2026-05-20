@@ -166,15 +166,13 @@ export default function App() {
         </div>
       </header>
 
-      <main className="overflow-visible">
-        <div className="mx-auto max-w-6xl overflow-x-hidden px-4 pb-16 pt-24 md:px-8 md:pt-28">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/recommend" element={<Recommendation />} />
-            <Route path="/benchmark" element={<Benchmark />} />
-            <Route path="/about" element={<AboutAlgorithm />} />
-          </Routes>
-        </div>
+      <main className="mx-auto max-w-6xl overflow-x-hidden px-4 pb-16 pt-24 md:px-8 md:pt-28">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/recommend" element={<Recommendation />} />
+          <Route path="/benchmark" element={<Benchmark />} />
+          <Route path="/about" element={<AboutAlgorithm />} />
+        </Routes>
       </main>
 
       <footer className="border-t border-white/[0.05] px-4 py-8 text-center text-xs text-slate-600 md:px-8">

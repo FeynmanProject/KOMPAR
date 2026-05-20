@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 @layer base {
-  html, body, #root { height: 100%; }
+  html,
+  body,
+  #root {
+    min-height: 100vh;
+  }
   html {
     background: #000000;
     overflow-x: hidden;
@@ -22,18 +26,6 @@
     overflow-x: hidden;
     overflow-y: visible;
   }
-  /* Hide scrollbar visuals, keep wheel/trackpad scrolling functional. */
-  html,
-  body {
-    scrollbar-width: none;      /* Firefox */
-    -ms-overflow-style: none;   /* old Edge/IE */
-  }
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;              /* Chromium/Safari */
-  }
   ::selection {
     background: rgba(124, 58, 237, 0.35);
     color: #fff;
@@ -42,14 +34,9 @@
 
 @media (max-width: 767px) {
   html,
-  body { overflow-y: auto; }
-}
-
-/* Force semantic <main> to never become an independent scroll container.
-   This prevents "inner scrollbar" on Home in some desktop browsers. */
-main {
-  overflow: visible !important;
-  max-height: none !important;
+  body {
+    overflow-y: auto;
+  }
 }
 
 @layer components {

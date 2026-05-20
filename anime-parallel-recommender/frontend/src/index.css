@@ -37,6 +37,21 @@
   }
 }
 
+@media (min-width: 768px) {
+  /* Desktop/laptop: keep scrolling behavior, hide the visible scrollbar UI
+     to avoid the "double scrollbar" look reported in browsers. */
+  html,
+  body {
+    scrollbar-width: none; /* Firefox */
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Chromium/WebKit */
+  }
+}
+
 @layer components {
   /* ────────────────────────────────────────────────────────────
      LIQUID GLASS UTILITY

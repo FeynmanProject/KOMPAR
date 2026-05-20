@@ -11,7 +11,7 @@
   html {
     background: #000000;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
   }
   body {
     font-family: "Inter", system-ui, sans-serif;
@@ -25,20 +25,6 @@
     min-height: 100vh;
     overflow-x: hidden;
     overflow-y: visible;
-  }
-  /* Keep a single page scroll behavior and never show native scrollbar UI. */
-  html,
-  body,
-  #root {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* old Edge/IE */
-  }
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar,
-  #root::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none; /* Chromium/WebKit */
   }
   ::selection {
     background: rgba(124, 58, 237, 0.35);

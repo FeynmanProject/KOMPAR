@@ -6,23 +6,23 @@
   html,
   body,
   #root {
-    min-height: 100%;
+    height: 100%;
   }
   html {
     background: #000000;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden; /* keep html from becoming a second scroller */
   }
   body {
     font-family: "Inter", system-ui, sans-serif;
     background: transparent;
     color: #e7e7ea;
-    min-height: 100vh;
+    min-height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: auto; /* single vertical scroll container */
   }
   #root {
-    min-height: 100vh;
+    min-height: 100%;
     overflow-x: hidden;
     overflow-y: visible;
   }
@@ -33,9 +33,8 @@
 }
 
 @media (max-width: 767px) {
-  html,
-  body {
-    overflow-y: auto;
+  html {
+    overflow-y: hidden;
   }
 }
 

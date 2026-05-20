@@ -38,14 +38,12 @@
 }
 
 @media (min-width: 768px) {
-  /* Desktop/laptop: keep scrolling behavior, hide the visible scrollbar UI
-     to avoid the "double scrollbar" look reported in browsers. */
-  html,
-  body {
+  /* Desktop/laptop: hide visual scrollbars for all scroll containers
+     (window + any nested panel) while keeping wheel/trackpad scrolling. */
+  * {
     scrollbar-width: none; /* Firefox */
   }
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     width: 0;
     height: 0;
     display: none; /* Chromium/WebKit */

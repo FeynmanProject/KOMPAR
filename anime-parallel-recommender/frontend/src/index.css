@@ -38,6 +38,13 @@
   }
 }
 
+/* Force semantic <main> to never become an independent scroll container.
+   This prevents "inner scrollbar" on Home in some desktop browsers. */
+main {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
 @layer components {
   /* ────────────────────────────────────────────────────────────
      LIQUID GLASS UTILITY

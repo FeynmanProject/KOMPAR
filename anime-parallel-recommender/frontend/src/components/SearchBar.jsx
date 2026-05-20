@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import AnimePoster from "./AnimePoster.jsx";
 import animeApi from "../api/animeApi.js";
 
-export default function SearchBar({ onSelect, placeholder = "Cari judul anime favoritmu..." }) {
+export default function SearchBar({
+  onSelect,
+  placeholder = "Cari judul anime favoritmu...",
+  onOpenChange,
+}) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
@@ -14,6 +18,7 @@ export default function SearchBar({ onSelect, placeholder = "Cari judul anime fa
     if (!query.trim()) {
       setResults([]);
       setOpen(false);
+      onOpenChange?.(false);
       return;
     }
     const handle = setTimeout(async () => {
@@ -23,10 +28,12 @@ export default function SearchBar({ onSelect, placeholder = "Cari judul anime fa
         const data = await animeApi.search(query.trim(), 12);
         setResults(data);
         setOpen(true);
+        onOpenChange?.(true);
       } catch (e) {
         setError(e.message);
         setResults([]);
         setOpen(true);
+        onOpenChange?.(true);
       } finally {
         setLoading(false);
       }
@@ -36,15 +43,19 @@ export default function SearchBar({ onSelect, placeholder = "Cari judul anime fa
 
   useEffect(() => {
     const onClick = (e) => {
-      if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false);
+      if (boxRef.current && !boxRef.current.contains(e.target)) {
+        setOpen(false);
+        onOpenChange?.(false);
+      }
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
-  }, []);
+  }, [onOpenChange]);
 
   function pick(anime) {
     setQuery(anime.title);
     setOpen(false);
+    onOpenChange?.(false);
     onSelect?.(anime);
   }
 

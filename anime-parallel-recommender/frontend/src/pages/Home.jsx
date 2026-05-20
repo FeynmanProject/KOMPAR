@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar.jsx";
 import animeApi from "../api/animeApi.js";
@@ -34,6 +34,7 @@ export default function Home() {
   const navigate = useNavigate();
   const [meta, setMeta] = useState(null);
   const [err, setErr] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     animeApi
@@ -44,14 +45,23 @@ export default function Home() {
 
   const datasetLabel = meta ? meta.dataset_size.toLocaleString("id-ID") : "...";
 
+  const handleHeroWheel = useCallback(
+    (event) => {
+      // When suggestion dropdown is open, keep native wheel behavior there.
+      if (searchOpen) return;
+      event.preventDefault();
+      window.scrollBy({ top: event.deltaY, left: 0, behavior: "auto" });
+    },
+    [searchOpen],
+  );
+
   return (
     <div className="home-no-inner-scroll space-y-24 overflow-x-hidden">
       {/* HERO */}
-      <section className="relative flex w-full max-w-full flex-col items-center overflow-x-hidden pt-6 text-center">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-24 -z-10 h-[min(100vw,320px)] w-[min(100vw,320px)] -translate-x-1/2 rounded-full bg-accent-500/20 blur-[80px] md:top-32 md:h-[520px] md:w-[520px] md:blur-[140px]"
-        />
+      <section
+        className="relative flex w-full max-w-full flex-col items-center overflow-x-hidden pt-6 text-center"
+        onWheel={handleHeroWheel}
+      >
         <span className="pill pill-dot">
           {meta ? `${datasetLabel} anime siap direkomendasikan` : "Memuat dataset..."}
         </span>
@@ -73,6 +83,7 @@ export default function Home() {
           <SearchBar
             onSelect={(a) => navigate(`/recommend?id=${a.id}`)}
             placeholder="Cari anime favorit — mis. Naruto, Spy x Family"
+            onOpenChange={setSearchOpen}
           />
         </div>
 

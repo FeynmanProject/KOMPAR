@@ -45,7 +45,7 @@ export default function Home() {
   const datasetLabel = meta ? meta.dataset_size.toLocaleString("id-ID") : "...";
 
   return (
-    <div className="space-y-24 overflow-x-hidden">
+    <div className="home-no-inner-scroll space-y-24 overflow-x-hidden">
       {/* HERO */}
       <section className="relative flex w-full max-w-full flex-col items-center overflow-x-hidden pt-6 text-center">
         <div

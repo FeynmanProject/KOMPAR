@@ -39,6 +39,21 @@
   }
 }
 
+@media (min-width: 768px) {
+  /* Home desktop: prevent any nested vertical scroller.
+     The page (window) remains the only vertical scroll container. */
+  .home-no-inner-scroll,
+  .home-no-inner-scroll * {
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
+  /* Keep search suggestions scrollable when opened intentionally. */
+  .home-no-inner-scroll .search-results-scroll {
+    overflow-y: auto !important;
+    max-height: 24rem !important;
+  }
+}
+
 @layer components {
   /* ────────────────────────────────────────────────────────────
      LIQUID GLASS UTILITY

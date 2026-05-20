@@ -71,7 +71,7 @@ export default function SearchBar({ onSelect, placeholder = "Cari judul anime fa
       </div>
 
       {open && (
-        <div className="absolute z-30 mt-2 max-h-96 w-full overflow-y-auto rounded-2xl border border-white/[0.08] bg-black/85 shadow-2xl backdrop-blur-xl">
+        <div className="search-results-scroll absolute z-30 mt-2 max-h-96 w-full overflow-y-auto rounded-2xl border border-white/[0.08] bg-black/85 shadow-2xl backdrop-blur-xl">
           {error && <div className="p-3 text-sm text-rose-300">{error}</div>}
           {!error && results.length === 0 && !loading && (
             <div className="p-3 text-sm text-slate-400">Tidak ada hasil.</div>
